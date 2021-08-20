@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import javax.annotation.PostConstruct
 
 @Controller
@@ -47,11 +48,28 @@ class BasicItemController @Autowired constructor (private val itemRepository: It
     return "basic/item"
   }
 
-  @PostMapping("/add")
+//  @PostMapping("/add")
   fun addItemV3(@ModelAttribute item: Item): String {
     // Item (class name) -> item
     itemRepository.save(item)
     return "basic/item"
+  }
+
+//  @PostMapping("/add")
+  fun addItemV4(@ModelAttribute item: Item): String {
+    // Item (class name) -> item
+    itemRepository.save(item)
+    return "redirect:/basic/items/" + item.id
+  }
+
+  @PostMapping("/add")
+  fun addItemV5(@ModelAttribute item: Item, redirectAttribute: RedirectAttributes): String {
+    // Item (class name) -> item
+    val savedItem = itemRepository.save(item)
+    redirectAttribute.addAttribute("itemId", savedItem.id)
+    // 나머지 attribute 들은 query parameter 형식으로 들어감
+    redirectAttribute.addAttribute("status", true)
+    return "redirect:/basic/items/{itemId}"
   }
 
   @GetMapping("/{itemId}/edit")
