@@ -5,8 +5,7 @@ import hello.springmvc.itemservice.domain.item.ItemRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.*
 import javax.annotation.PostConstruct
 
 @Controller
@@ -18,6 +17,43 @@ class BasicItemController @Autowired constructor (private val itemRepository: It
     model.addAttribute("items", items)
     return "basic/items"
   }
+
+  @GetMapping("/{itemId}")
+  fun item(@PathVariable itemId: Long, model: Model): String {
+    val item = itemRepository.findById(itemId)
+    model.addAttribute("item", item)
+    return "basic/item"
+  }
+
+  @GetMapping("/add")
+  fun addForm(): String {
+    return "basic/addForm"
+  }
+
+  //  @PostMapping("/add")
+  fun addItemV1(@RequestParam itemName: String,
+                @RequestParam price: Int,
+                @RequestParam quantity: Int,
+                model: Model): String {
+    val save = itemRepository.save(Item(itemName, price, quantity))
+    model.addAttribute("item", save)
+    return "basic/item"
+  }
+
+//  @PostMapping("/add")
+  fun addItemV2(@ModelAttribute("item") item: Item): String {
+    itemRepository.save(item)
+//    model.addAttribute("item", save)
+    return "basic/item"
+  }
+
+  @PostMapping("/add")
+  fun addItemV3(@ModelAttribute item: Item): String {
+    // Item (class name) -> item
+    itemRepository.save(item)
+    return "basic/item"
+  }
+
 
   /**
    * For test
